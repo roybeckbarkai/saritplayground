@@ -20,31 +20,35 @@ export default function ParentDonePage() {
   }, [router]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-amber-50">
-      <div className="w-full max-w-md">
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-white">
+      <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-6xl mb-3">🎉</div>
-          <h1 className="text-3xl font-black text-green-500">הגדרה הושלמה!</h1>
-          {family && (
-            <div className="mt-4 bg-orange-100 border-2 border-orange-300 rounded-2xl p-4">
-              <p className="text-sm text-gray-600 mb-1">מפתח הכניסה לילדים:</p>
-              <p className="text-2xl font-black text-orange-600">{family.familyName}</p>
-              <p className="text-xs text-gray-500 mt-1">הילדים יזינו את שם המשפחה + שמם האישי</p>
-            </div>
-          )}
+          <div className="w-16 h-16 bg-sky-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">✓</span>
+          </div>
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">הגדרה הושלמה</h1>
+          <p className="text-slate-400 text-sm mt-1">הכל מוכן לגלגול</p>
         </div>
 
+        {family && (
+          <div className="bg-gray-50 border border-slate-200 rounded-2xl p-5 mb-6 text-center">
+            <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">מפתח כניסה לילדים</p>
+            <p className="text-3xl font-bold text-slate-900 tracking-tight">{family.familyName}</p>
+            <p className="text-xs text-slate-400 mt-2">שם משפחה + שם פרטי</p>
+          </div>
+        )}
+
         {children.length > 0 && (
-          <div className="bg-white rounded-3xl shadow p-5 mb-6">
-            <h2 className="font-black text-gray-700 mb-3">הילדים שלכם:</h2>
-            {children.map(child => {
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden mb-6">
+            {children.map((child, i) => {
               const active = child.foodOptions.filter(f => f.isActive).length;
               return (
-                <div key={child.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                  <span className="text-sm text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full font-medium">
-                    {active} מנות
-                  </span>
-                  <span className="font-bold text-gray-800">{child.name}</span>
+                <div key={child.id}>
+                  {i > 0 && <div className="h-px bg-slate-100" />}
+                  <div className="flex items-center justify-between px-5 py-3.5">
+                    <span className="text-sm text-slate-400">{active} מנות</span>
+                    <span className="font-medium text-slate-900">{child.name}</span>
+                  </div>
                 </div>
               );
             })}
@@ -54,15 +58,15 @@ export default function ParentDonePage() {
         <div className="flex flex-col gap-3">
           <Link
             href="/parent/setup"
-            className="block text-center bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 rounded-2xl border-2 border-gray-200 transition-colors"
+            className="block text-center bg-white hover:bg-slate-50 text-slate-700 font-medium py-3.5 rounded-2xl border border-slate-200 transition-colors text-sm"
           >
-            ✏️ חזרה לעריכה
+            עריכה
           </Link>
           <Link
             href="/"
-            className="block text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-2xl transition-colors"
+            className="block text-center bg-sky-500 hover:bg-sky-600 text-white font-medium py-3.5 rounded-2xl transition-colors text-sm"
           >
-            🏠 דף הבית
+            דף הבית
           </Link>
         </div>
       </div>

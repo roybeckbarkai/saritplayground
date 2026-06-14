@@ -2,10 +2,11 @@
 import { useRef, useState } from 'react';
 import { FoodOption } from '@/lib/types';
 
+// Teal-to-blue palette, clean and Apple-ish
 const COLORS = [
-  '#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF',
-  '#FF922B', '#CC5DE8', '#20C997', '#F06595',
-  '#74C0FC', '#A9E34B', '#FFA94D', '#DA77F2',
+  '#0EA5E9', '#38BDF8', '#0284C7', '#7DD3FC',
+  '#0369A1', '#BAE6FD', '#075985', '#E0F2FE',
+  '#0891B2', '#67E8F9', '#0E7490', '#A5F3FC',
 ];
 
 interface Props {
@@ -31,19 +32,17 @@ export default function SpinWheel({ foods }: Props) {
   const [totalRotation, setTotalRotation] = useState(0);
 
   const n = foods.length;
-  const sectorAngle = 360 / n;
   const cx = 200, cy = 200, r = 185;
+  const sectorAngle = n > 0 ? 360 / n : 360;
 
   const spin = () => {
-    if (spinning) return;
+    if (spinning || n < 2) return;
     setResult(null);
     setSpinning(true);
 
     const selectedIndex = Math.floor(Math.random() * n);
-    // Land in the middle of the selected sector, pointer is at top (0°)
-    // Sector i starts at i * sectorAngle, we want its middle to point up
     const sectorMid = selectedIndex * sectorAngle + sectorAngle / 2;
-    const targetAngle = 360 * 5 + (360 - sectorMid); // 5 full spins + alignment
+    const targetAngle = 360 * 6 + (360 - sectorMid);
     const newTotal = totalRotation + targetAngle;
     setTotalRotation(newTotal);
 
@@ -61,94 +60,112 @@ export default function SpinWheel({ foods }: Props) {
 
   if (n === 0) {
     return (
-      <div className="text-center p-8 bg-white rounded-3xl shadow">
-        <div className="text-5xl mb-4">😕</div>
-        <p className="text-xl font-bold text-gray-600">אין מנות זמינות</p>
-        <p className="text-gray-400 mt-2">בקשו מההורה להוסיף מנות לרשימה שלכם</p>
+      <div className="text-center p-10 bg-gray-50 rounded-3xl border border-slate-200">
+        <p className="text-4xl mb-3">😕</p>
+        <p className="font-semibold text-slate-700">אין מנות זמינות</p>
+        <p className="text-slate-400 text-sm mt-1">בקשו מההורה להוסיף מנות</p>
       </div>
     );
   }
 
   if (n === 1) {
     return (
-      <div className="text-center p-8 bg-white rounded-3xl shadow">
-        <div className="text-6xl mb-4">{foods[0].emoji}</div>
-        <p className="text-2xl font-black text-orange-500">{foods[0].name}</p>
-        <p className="text-gray-400 mt-2 text-sm">יש רק מנה אחת - זו הבחירה!</p>
+      <div className="text-center p-10 bg-gray-50 rounded-3xl border border-slate-200">
+        <p className="text-5xl mb-3">{foods[0].emoji}</p>
+        <p className="font-semibold text-slate-900 text-xl">{foods[0].name}</p>
+        <p className="text-slate-400 text-sm mt-1">מנה יחידה — זו ההחלטה!</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      {/* Pointer */}
-      <div className="relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-10 text-3xl drop-shadow-md">▼</div>
-        <svg width="400" height="400" viewBox="0 0 400 400" className="drop-shadow-xl max-w-full">
+    <div className="flex flex-col items-center gap-8 w-full">
+      {/* Wheel */}
+      <div className="relative w-full max-w-[400px]">
+        {/* Pointer */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10">
+          <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[20px] border-l-transparent border-r-transparent border-t-slate-800" />
+        </div>
+
+        <svg viewBox="0 0 400 400" className="w-full drop-shadow-md">
+          {/* Outer ring */}
+          <circle cx={cx} cy={cy} r={r + 4} fill="none" stroke="#E2E8F0" strokeWidth="2" />
+
           <g ref={wheelRef}>
             {foods.map((food, i) => {
               const startAngle = i * sectorAngle;
               const endAngle = (i + 1) * sectorAngle;
               const mid = startAngle + sectorAngle / 2;
               const midRad = ((mid - 90) * Math.PI) / 180;
-              const textR = r * 0.65;
+              const textR = r * 0.62;
               const tx = cx + textR * Math.cos(midRad);
               const ty = cy + textR * Math.sin(midRad);
               const color = COLORS[i % COLORS.length];
 
               return (
                 <g key={food.id}>
-                  <path d={sectorPath(cx, cy, r, startAngle, endAngle)} fill={color} stroke="white" strokeWidth="2" />
+                  <path
+                    d={sectorPath(cx, cy, r, startAngle, endAngle)}
+                    fill={color}
+                    stroke="white"
+                    strokeWidth="1.5"
+                  />
                   <text
                     x={tx}
                     y={ty}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fontSize={sectorAngle > 45 ? '22' : sectorAngle > 25 ? '16' : '12'}
+                    fontSize={sectorAngle > 45 ? '24' : sectorAngle > 25 ? '18' : '13'}
                     transform={`rotate(${mid}, ${tx}, ${ty})`}
                   >
                     {food.emoji}
                   </text>
-                  {sectorAngle > 30 && (
+                  {sectorAngle >= 28 && (
                     <text
                       x={tx}
                       y={ty + (sectorAngle > 45 ? 22 : 16)}
                       textAnchor="middle"
                       dominantBaseline="middle"
                       fontSize={sectorAngle > 45 ? '9' : '7'}
-                      fill="white"
-                      fontWeight="bold"
+                      fill="rgba(255,255,255,0.9)"
+                      fontWeight="600"
                       transform={`rotate(${mid}, ${tx}, ${ty + (sectorAngle > 45 ? 22 : 16)})`}
                     >
-                      {food.name.length > 10 ? food.name.slice(0, 10) + '…' : food.name}
+                      {food.name.length > 9 ? food.name.slice(0, 9) + '…' : food.name}
                     </text>
                   )}
                 </g>
               );
             })}
-            {/* Center circle */}
-            <circle cx={cx} cy={cy} r={28} fill="white" stroke="#f97316" strokeWidth="3" />
-            <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize="18">🍽️</text>
+
+            {/* Center */}
+            <circle cx={cx} cy={cy} r={26} fill="white" stroke="#E2E8F0" strokeWidth="2" />
+            <text x={cx} y={cy} textAnchor="middle" dominantBaseline="middle" fontSize="16">🎡</text>
           </g>
         </svg>
       </div>
 
-      {/* Spin button */}
+      {/* Button */}
       <button
         onClick={spin}
         disabled={spinning}
-        className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-black text-2xl px-12 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 disabled:cursor-not-allowed"
+        className="bg-sky-500 hover:bg-sky-600 disabled:bg-slate-200 disabled:text-slate-400 text-white font-medium text-xl px-14 py-4 rounded-full transition-all duration-200 active:scale-95 shadow-sm"
       >
-        {spinning ? '⏳ מסתובב...' : '🎲 סובב!'}
+        {spinning ? 'מסתובב...' : 'סובב'}
       </button>
 
       {/* Result */}
       {result && !spinning && (
-        <div className="text-center bg-white rounded-3xl shadow-lg p-6 w-full max-w-xs animate-pop">
-          <p className="text-gray-500 text-sm mb-2 font-medium">הערב אוכלים:</p>
-          <div className="text-6xl mb-3">{result.emoji}</div>
-          <p className="text-2xl font-black text-orange-500">{result.name}</p>
-          <p className="text-4xl mt-2">🎉</p>
+        <div className="text-center bg-gray-50 rounded-3xl border border-slate-200 p-8 w-full animate-pop">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-3">הערב אוכלים</p>
+          <p className="text-6xl mb-3">{result.emoji}</p>
+          <p className="text-2xl font-semibold text-slate-900 tracking-tight">{result.name}</p>
+          <button
+            onClick={spin}
+            className="mt-5 text-sky-500 text-sm font-medium hover:text-sky-600 transition-colors"
+          >
+            סובב שוב
+          </button>
         </div>
       )}
     </div>

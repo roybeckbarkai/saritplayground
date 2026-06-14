@@ -18,53 +18,56 @@ export default function ChildLoginPage() {
 
     const child = findChild(familyName.trim(), childName.trim());
     if (!child) {
-      setError('לא מצאנו אותך 😕 בדקו שם משפחה ושם פרטי');
+      setError('לא מצאנו אותך — בדקו שם משפחה ושם פרטי');
       return;
     }
 
     sessionStorage.setItem('currentChildId', child.id);
-    sessionStorage.setItem('currentFamilyName', familyName.trim());
     router.push('/child/spin');
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-amber-50 to-orange-100">
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-white">
       <div className="w-full max-w-sm">
-        <Link href="/" className="text-orange-400 text-sm mb-6 block text-right">→ חזרה</Link>
+        <Link href="/" className="text-slate-400 text-sm mb-8 block flex items-center gap-1">
+          <span>→</span><span>חזרה</span>
+        </Link>
 
-        <div className="text-center mb-8">
-          <div className="text-7xl mb-4 animate-float">🎡</div>
-          <h1 className="text-3xl font-black text-orange-500">כניסת ילד/ה</h1>
-          <p className="text-gray-500 mt-1">מי מסתובב היום?</p>
+        <div className="text-center mb-10">
+          <div className="text-6xl mb-5 animate-float inline-block">🎡</div>
+          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">מי מסתובב היום?</h1>
+          <p className="text-slate-400 text-sm mt-1">הזינו שם משפחה ושם פרטי</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-lg p-7 flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-bold text-gray-600 mb-2">שם משפחה</label>
+            <label className="block text-sm font-medium text-slate-600 mb-1.5">שם משפחה</label>
             <input
               type="text"
               value={familyName}
               onChange={e => { setFamilyName(e.target.value); setError(''); }}
-              placeholder='למשל: כהן'
-              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-400 text-gray-800 text-xl font-bold"
+              placeholder='כהן'
+              className="w-full border border-slate-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-slate-900 text-lg font-medium bg-white"
+              autoComplete="off"
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-600 mb-2">שם פרטי</label>
+            <label className="block text-sm font-medium text-slate-600 mb-1.5">שם פרטי</label>
             <input
               type="text"
               value={childName}
               onChange={e => { setChildName(e.target.value); setError(''); }}
-              placeholder='השם שלי'
-              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-400 text-gray-800 text-xl font-bold"
+              placeholder='נועה'
+              className="w-full border border-slate-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-slate-900 text-lg font-medium bg-white"
+              autoComplete="off"
             />
           </div>
-          {error && <p className="text-red-500 text-sm font-medium text-center">{error}</p>}
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white font-black text-2xl py-4 rounded-2xl transition-colors shadow-md active:scale-95"
+            className="bg-sky-500 hover:bg-sky-600 text-white font-medium text-base py-4 rounded-2xl transition-colors mt-2 active:scale-98"
           >
-            בואו נגלגל! 🎲
+            בואו נגלגל 🎲
           </button>
         </form>
       </div>

@@ -3,10 +3,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getFamilies, getChildrenByFamily, saveChild, deleteChild, defaultFoodOptions } from '@/lib/storage';
 import { Child, FoodOption, Family } from '@/lib/types';
-import { masterDishes } from '@/lib/mockData';
 import Link from 'next/link';
 
-const EMOJI_OPTIONS = ['🍽️','🍜','🥩','🍱','🥪','🫔','🍛','🥘','🍲','🫕','🥞','🧆','🥙','🌯','🥗'];
+const EMOJI_OPTIONS = ['🍽️','🍜','🥩','🍱','🥪','🫔','🍛','🥘','🍲','🫕','🥞','🧆','🥙','🌯','🥗','🧁','🍰','🍣','🥐','🫙'];
 
 export default function ParentSetupPage() {
   const router = useRouter();
@@ -21,8 +20,7 @@ export default function ParentSetupPage() {
   useEffect(() => {
     const familyId = sessionStorage.getItem('currentFamilyId');
     if (!familyId) { router.push('/parent/register'); return; }
-    const all = getFamilies();
-    const f = all.find(x => x.id === familyId);
+    const f = getFamilies().find(x => x.id === familyId);
     if (!f) { router.push('/parent/register'); return; }
     setFamily(f);
     setChildren(getChildrenByFamily(familyId));
@@ -74,6 +72,7 @@ export default function ParentSetupPage() {
     setChildren(prev => prev.map(c => c.id === updated.id ? updated : c));
     setCustomName('');
     setCustomEmoji('🍽️');
+    setShowEmojiPicker(false);
   };
 
   const removeFood = (foodId: string) => {
@@ -96,22 +95,26 @@ export default function ParentSetupPage() {
   const activeCount = editingChild?.foodOptions.filter(f => f.isActive).length ?? 0;
 
   return (
-    <main className="min-h-screen bg-amber-50 p-4 pb-24">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <Link href="/" className="text-orange-400 text-sm">→ דף הבית</Link>
-          <h1 className="text-xl font-black text-gray-800">
-            {family ? `משפחת ${family.familyName}` : ''}
+    <main className="min-h-screen bg-gray-50 pb-24">
+      {/* Header */}
+      <div className="bg-white border-b border-slate-200 px-5 py-4 sticky top-0 z-10">
+        <div className="max-w-lg mx-auto flex items-center justify-between">
+          <Link href="/parent/done" className="text-sky-500 text-sm font-medium">סיום</Link>
+          <h1 className="text-base font-semibold text-slate-900">
+            {family ? `משפחת ${family.familyName}` : 'הגדרות'}
           </h1>
+          <Link href="/" className="text-slate-400 text-sm">בית</Link>
         </div>
+      </div>
 
+      <div className="max-w-lg mx-auto p-4 flex flex-col gap-4">
         {/* Add child */}
-        <div className="bg-white rounded-3xl shadow p-5 mb-4">
-          <h2 className="font-black text-gray-700 mb-3 text-lg">הוספת ילד/ה</h2>
+        <div className="bg-white rounded-2xl border border-slate-200 p-5">
+          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">הוספת ילד/ה</h2>
           <div className="flex gap-2">
             <button
               onClick={addChild}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-5 rounded-xl transition-colors text-xl"
+              className="bg-sky-500 hover:bg-sky-600 text-white font-medium w-10 rounded-xl transition-colors text-xl flex-shrink-0"
             >+</button>
             <input
               type="text"
@@ -119,176 +122,142 @@ export default function ParentSetupPage() {
               onChange={e => setNewChildName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && addChild()}
               placeholder="שם הילד/ה"
-              className="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-orange-400 text-gray-800 text-lg"
+              className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-slate-900 bg-white"
             />
           </div>
         </div>
 
         {/* Children list */}
         {children.length > 0 && (
-          <div className="bg-white rounded-3xl shadow p-5 mb-4">
-            <h2 className="font-black text-gray-700 mb-3 text-lg">ילדים</h2>
-            <div className="flex flex-col gap-2">
-              {children.map(child => {
-                const active = child.foodOptions.filter(f => f.isActive).length;
-                return (
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <div className="px-5 pt-4 pb-2">
+              <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">ילדים</h2>
+            </div>
+            {children.map((child, i) => {
+              const active = child.foodOptions.filter(f => f.isActive).length;
+              const isEditing = editingChild?.id === child.id;
+              return (
+                <div key={child.id}>
+                  {i > 0 && <div className="h-px bg-slate-100 mx-5" />}
                   <div
-                    key={child.id}
-                    className={`flex items-center justify-between p-3 rounded-2xl border-2 cursor-pointer transition-colors ${
-                      editingChild?.id === child.id
-                        ? 'border-orange-400 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-200'
-                    }`}
-                    onClick={() => setEditingChild(child)}
+                    className={`flex items-center justify-between px-5 py-3.5 cursor-pointer transition-colors ${isEditing ? 'bg-sky-50' : 'hover:bg-slate-50'}`}
+                    onClick={() => setEditingChild(isEditing ? null : child)}
                   >
-                    <div className="flex gap-2 items-center">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-slate-400">{active} מנות</span>
+                      {isEditing && <span className="text-xs text-sky-500 font-medium">עריכה</span>}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="font-medium text-slate-900">{child.name}</span>
                       <button
                         onClick={e => { e.stopPropagation(); removeChild(child.id); }}
-                        className="text-gray-300 hover:text-red-400 text-lg transition-colors"
+                        className="text-slate-300 hover:text-red-400 transition-colors text-sm"
                       >✕</button>
-                      <span className="text-sm text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full font-medium">
-                        {active} מנות
-                      </span>
                     </div>
-                    <span className="font-bold text-gray-800 text-lg">{child.name}</span>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
         {/* Food editor */}
         {editingChild && (
-          <div className="bg-white rounded-3xl shadow p-5 mb-4">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm text-orange-500 font-medium bg-orange-100 px-3 py-1 rounded-full">
-                {activeCount} מנות פעילות
-              </span>
-              <h2 className="font-black text-gray-800 text-xl">מנות של {editingChild.name}</h2>
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <div className="px-5 pt-4 pb-3 border-b border-slate-100 flex items-center justify-between">
+              <span className="text-sm text-slate-400">{activeCount} פעילות</span>
+              <h2 className="font-semibold text-slate-900">מנות של {editingChild.name}</h2>
             </div>
 
             {/* Master dishes */}
-            <div className="mb-5">
-              <p className="text-sm font-bold text-gray-500 mb-3 text-right">מנות בסיס — סמנו אילו רלוונטיות</p>
-              <div className="flex flex-col gap-2">
-                {editingChild.foodOptions.filter(f => f.source === 'master').map(food => (
-                  <div
-                    key={food.id}
-                    className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                      food.isActive
-                        ? 'border-orange-300 bg-orange-50'
-                        : 'border-gray-100 bg-gray-50 opacity-60'
-                    }`}
-                  >
-                    <div className="flex gap-2 items-center">
-                      <button
-                        onClick={() => removeFood(food.id)}
-                        className="text-gray-300 hover:text-red-400 text-sm transition-colors"
-                        title="הסר לגמרי"
-                      >🗑️</button>
-                      <button
-                        onClick={() => toggleFood(food)}
-                        className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${
-                          food.isActive ? 'bg-orange-500 border-orange-500 text-white' : 'border-gray-300'
-                        }`}
-                      >
-                        {food.isActive && '✓'}
-                      </button>
-                    </div>
-                    <span className="font-medium text-gray-700">
-                      {food.emoji} {food.name}
-                    </span>
+            <div className="divide-y divide-slate-100">
+              {editingChild.foodOptions.filter(f => f.source === 'master').map(food => (
+                <div key={food.id} className="flex items-center justify-between px-5 py-3">
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => removeFood(food.id)} className="text-slate-200 hover:text-red-400 transition-colors text-xs">🗑</button>
+                    <button
+                      onClick={() => toggleFood(food)}
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                        food.isActive ? 'bg-sky-500 border-sky-500' : 'border-slate-300'
+                      }`}
+                    >
+                      {food.isActive && <span className="text-white text-xs">✓</span>}
+                    </button>
                   </div>
-                ))}
-              </div>
+                  <span className={`text-sm ${food.isActive ? 'text-slate-900' : 'text-slate-400'}`}>
+                    {food.emoji} {food.name}
+                  </span>
+                </div>
+              ))}
             </div>
 
             {/* Custom dishes */}
-            {editingChild.foodOptions.filter(f => f.source === 'custom').length > 0 && (
-              <div className="mb-5">
-                <p className="text-sm font-bold text-gray-500 mb-3 text-right">מנות מותאמות אישית</p>
-                <div className="flex flex-col gap-2">
-                  {editingChild.foodOptions.filter(f => f.source === 'custom').map(food => (
-                    <div
-                      key={food.id}
-                      className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                        food.isActive ? 'border-purple-300 bg-purple-50' : 'border-gray-100 bg-gray-50 opacity-60'
-                      }`}
-                    >
-                      <div className="flex gap-2 items-center">
-                        <button onClick={() => removeFood(food.id)} className="text-gray-300 hover:text-red-400 text-sm">🗑️</button>
-                        <button
-                          onClick={() => toggleFood(food)}
-                          className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${
-                            food.isActive ? 'bg-purple-500 border-purple-500 text-white' : 'border-gray-300'
-                          }`}
-                        >
-                          {food.isActive && '✓'}
-                        </button>
-                      </div>
-                      <span className="font-medium text-gray-700">{food.emoji} {food.name}</span>
-                    </div>
-                  ))}
+            {editingChild.foodOptions.filter(f => f.source === 'custom').map(food => (
+              <div key={food.id} className="flex items-center justify-between px-5 py-3 border-t border-slate-100 bg-slate-50">
+                <div className="flex items-center gap-3">
+                  <button onClick={() => removeFood(food.id)} className="text-slate-200 hover:text-red-400 transition-colors text-xs">🗑</button>
+                  <button
+                    onClick={() => toggleFood(food)}
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                      food.isActive ? 'bg-sky-500 border-sky-500' : 'border-slate-300'
+                    }`}
+                  >
+                    {food.isActive && <span className="text-white text-xs">✓</span>}
+                  </button>
                 </div>
+                <span className={`text-sm ${food.isActive ? 'text-slate-900' : 'text-slate-400'}`}>
+                  {food.emoji} {food.name}
+                </span>
               </div>
-            )}
+            ))}
 
             {/* Add custom */}
-            <div className="border-t-2 border-gray-100 pt-4">
-              <p className="text-sm font-bold text-gray-500 mb-3 text-right">הוסיפו מנה שלא ברשימה</p>
-              <div className="flex gap-2 items-center">
+            <div className="px-5 py-4 border-t border-slate-100 bg-slate-50">
+              <p className="text-xs font-medium text-slate-400 mb-3 text-right">הוספת מנה מותאמת</p>
+              <div className="flex gap-2">
                 <button
                   onClick={addCustomFood}
                   disabled={!customName.trim()}
-                  className="bg-purple-500 hover:bg-purple-600 disabled:bg-gray-300 text-white font-bold px-4 py-2.5 rounded-xl transition-colors"
-                >
-                  הוסף
-                </button>
+                  className="bg-sky-500 hover:bg-sky-600 disabled:bg-slate-200 text-white font-medium px-4 py-2 rounded-xl transition-colors text-sm flex-shrink-0"
+                >הוסף</button>
                 <input
                   type="text"
                   value={customName}
                   onChange={e => setCustomName(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addCustomFood()}
                   placeholder="שם המנה"
-                  className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-purple-400 text-gray-800"
+                  className="flex-1 border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-sky-400 text-slate-900 text-sm bg-white min-w-0"
                 />
                 <button
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="text-2xl border-2 border-gray-200 rounded-xl px-3 py-2 hover:border-purple-300 transition-colors"
-                >
-                  {customEmoji}
-                </button>
+                  className="text-xl border border-slate-200 rounded-xl px-3 py-2 bg-white hover:border-sky-300 transition-colors flex-shrink-0"
+                >{customEmoji}</button>
               </div>
               {showEmojiPicker && (
-                <div className="mt-2 flex flex-wrap gap-2 justify-end bg-gray-50 rounded-xl p-3">
+                <div className="mt-2 flex flex-wrap gap-2 justify-end bg-white rounded-xl p-3 border border-slate-200">
                   {EMOJI_OPTIONS.map(e => (
-                    <button
-                      key={e}
-                      onClick={() => { setCustomEmoji(e); setShowEmojiPicker(false); }}
-                      className="text-2xl hover:scale-125 transition-transform"
-                    >{e}</button>
+                    <button key={e} onClick={() => { setCustomEmoji(e); setShowEmojiPicker(false); }} className="text-xl hover:scale-125 transition-transform">{e}</button>
                   ))}
                 </div>
               )}
             </div>
           </div>
         )}
-
-        {/* Done button */}
-        {children.length > 0 && (
-          <div className="fixed bottom-0 right-0 left-0 p-4 bg-amber-50 border-t border-amber-200">
-            <div className="max-w-2xl mx-auto">
-              <Link
-                href="/parent/done"
-                className="block w-full bg-green-500 hover:bg-green-600 text-white font-bold text-xl py-4 rounded-2xl text-center transition-colors shadow-md"
-              >
-                סיימתי להגדיר ✅
-              </Link>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Done bar */}
+      {children.length > 0 && (
+        <div className="fixed bottom-0 right-0 left-0 p-4 bg-white border-t border-slate-200">
+          <div className="max-w-lg mx-auto">
+            <Link
+              href="/parent/done"
+              className="block w-full bg-sky-500 hover:bg-sky-600 text-white font-medium text-base py-3.5 rounded-2xl text-center transition-colors"
+            >
+              סיום הגדרה
+            </Link>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

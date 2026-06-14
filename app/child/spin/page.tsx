@@ -23,17 +23,18 @@ export default function SpinPage() {
   const activeFoods = child.foodOptions.filter(f => f.isActive);
 
   return (
-    <main className="min-h-screen flex flex-col items-center p-4 bg-gradient-to-b from-amber-50 to-orange-100">
-      <div className="w-full max-w-lg">
-        <div className="flex items-center justify-between mb-4 pt-2">
-          <Link href="/child/login" className="text-orange-400 text-sm">→ חזרה</Link>
-          <div className="text-center">
-            <h1 className="text-2xl font-black text-orange-500">{child.name}</h1>
-            <p className="text-gray-400 text-xs">{activeFoods.length} מנות אפשריות</p>
-          </div>
-          <div className="w-12" />
+    <main className="min-h-screen flex flex-col items-center bg-white">
+      {/* Header */}
+      <div className="w-full border-b border-slate-100 px-5 py-4 flex items-center justify-between max-w-lg mx-auto">
+        <Link href="/child/login" className="text-slate-400 text-sm">→ חזרה</Link>
+        <div className="text-center">
+          <p className="font-semibold text-slate-900">{child.name}</p>
+          <p className="text-xs text-slate-400">{activeFoods.length} אפשרויות</p>
         </div>
+        <div className="w-12" />
+      </div>
 
+      <div className="w-full max-w-lg px-4 pt-6 flex flex-col items-center">
         <SpinWheel foods={activeFoods} />
       </div>
     </main>
