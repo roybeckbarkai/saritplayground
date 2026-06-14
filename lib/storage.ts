@@ -1,43 +1,77 @@
-import { Family, Child, DailySelection } from './types';
+import { Family, Child, FoodOption } from './types';
+import { masterDishes } from './mockData';
 
-const FAMILY_KEY = 'mah_leechol_family';
-const CHILDREN_KEY = 'mah_leechol_children';
-const SELECTIONS_KEY = 'mah_leechol_selections';
+const FAMILIES_KEY = 'mah_ochlin_families';
+const CHILDREN_KEY = 'mah_ochlin_children';
+
+// --- Families ---
+
+export function getFamilies(): Family[] {
+  if (typeof window === 'undefined') return [];
+  const data = localStorage.getItem(FAMILIES_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+export function getFamilyByName(familyName: string): Family | null {
+  return getFamilies().find(f => f.familyName.toLowerCase() === familyName.toLowerCase()) ?? null;
+}
+
+export function getFamilyByEmail(email: string): Family | null {
+  return getFamilies().find(f => f.email.toLowerCase() === email.toLowerCase()) ?? null;
+}
+
+export function isFamilyNameTaken(familyName: string): boolean {
+  return getFamilies().some(f => f.familyName.toLowerCase() === familyName.toLowerCase());
+}
 
 export function saveFamily(family: Family): void {
-  localStorage.setItem(FAMILY_KEY, JSON.stringify(family));
+  const families = getFamilies();
+  const idx = families.findIndex(f => f.id === family.id);
+  if (idx >= 0) families[idx] = family;
+  else families.push(family);
+  localStorage.setItem(FAMILIES_KEY, JSON.stringify(families));
 }
 
-export function getFamily(): Family | null {
-  const data = localStorage.getItem(FAMILY_KEY);
-  return data ? JSON.parse(data) : null;
-}
-
-export function saveChildren(children: Child[]): void {
-  localStorage.setItem(CHILDREN_KEY, JSON.stringify(children));
-}
+// --- Children ---
 
 export function getChildren(): Child[] {
+  if (typeof window === 'undefined') return [];
   const data = localStorage.getItem(CHILDREN_KEY);
   return data ? JSON.parse(data) : [];
 }
 
-export function saveDailySelection(selection: DailySelection): void {
-  const existing = getDailySelections();
-  const today = new Date().toISOString().split('T')[0];
-  const filtered = existing.filter(
-    (s) => !(s.childId === selection.childId && s.date === today)
-  );
-  filtered.push(selection);
-  localStorage.setItem(SELECTIONS_KEY, JSON.stringify(filtered));
+export function getChildrenByFamily(familyId: string): Child[] {
+  return getChildren().filter(c => c.familyId === familyId);
 }
 
-export function getDailySelections(): DailySelection[] {
-  const data = localStorage.getItem(SELECTIONS_KEY);
-  return data ? JSON.parse(data) : [];
+export function findChild(familyName: string, childName: string): Child | null {
+  const family = getFamilyByName(familyName);
+  if (!family) return null;
+  return getChildren().find(
+    c => c.familyId === family.id && c.name.trim() === childName.trim()
+  ) ?? null;
 }
 
-export function getTodaySelections(): DailySelection[] {
-  const today = new Date().toISOString().split('T')[0];
-  return getDailySelections().filter((s) => s.date === today);
+export function saveChild(child: Child): void {
+  const children = getChildren();
+  const idx = children.findIndex(c => c.id === child.id);
+  if (idx >= 0) children[idx] = child;
+  else children.push(child);
+  localStorage.setItem(CHILDREN_KEY, JSON.stringify(children));
+}
+
+export function deleteChild(childId: string): void {
+  const children = getChildren().filter(c => c.id !== childId);
+  localStorage.setItem(CHILDREN_KEY, JSON.stringify(children));
+}
+
+// --- Default food options for a new child ---
+export function defaultFoodOptions(): FoodOption[] {
+  return masterDishes.map(dish => ({
+    id: dish.id,
+    name: dish.name,
+    emoji: dish.emoji,
+    isActive: dish.isDefault,
+    source: 'master' as const,
+  }));
 }

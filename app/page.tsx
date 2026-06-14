@@ -1,82 +1,31 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { saveFamily } from '@/lib/storage';
-import { Family } from '@/lib/types';
-import AnimatedPlate from '@/components/AnimatedPlate';
+import Link from 'next/link';
 
 export default function HomePage() {
-  const router = useRouter();
-  const [familyName, setFamilyName] = useState('');
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!familyName.trim()) {
-      setError('נא להזין שם משפחה');
-      return;
-    }
-    if (!email.trim() || !email.includes('@')) {
-      setError('נא להזין אימייל תקין');
-      return;
-    }
-
-    const family: Family = {
-      id: Date.now().toString(),
-      email: email.trim(),
-      familyName: familyName.trim(),
-      createdAt: new Date().toISOString(),
-    };
-
-    saveFamily(family);
-    router.push('/family/setup');
-  };
-
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <AnimatedPlate emoji="🍽️" size={90} />
-          <h1 className="text-5xl font-black text-orange-500 mt-4 mb-2">מה לאכול?</h1>
-          <p className="text-gray-500 text-lg">בחירת ארוחות לילדים, בקלות ובכיף</p>
-        </div>
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-b from-amber-50 to-orange-100">
+      <div className="w-full max-w-sm text-center">
+        <div className="text-8xl mb-4 animate-float">🎡</div>
+        <h1 className="text-4xl font-black text-orange-500 mb-2">מה אוכלים הערב?</h1>
+        <p className="text-gray-500 mb-10 text-lg">גלגל המזל של המשפחה</p>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-lg p-8 flex flex-col gap-5">
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">שם משפחה</label>
-            <input
-              type="text"
-              value={familyName}
-              onChange={(e) => { setFamilyName(e.target.value); setError(''); }}
-              placeholder="למשל: משפחת כהן"
-              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-right focus:outline-none focus:border-orange-400 text-gray-800 text-lg"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">אימייל</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setError(''); }}
-              placeholder="example@email.com"
-              className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-right focus:outline-none focus:border-orange-400 text-gray-800 text-lg"
-              dir="ltr"
-            />
-          </div>
-
-          {error && (
-            <p className="text-red-500 text-sm font-medium text-center">{error}</p>
-          )}
-
-          <button
-            type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xl py-4 rounded-2xl transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+        <div className="flex flex-col gap-4">
+          <Link
+            href="/child/login"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-black text-2xl py-5 rounded-3xl shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 flex items-center justify-center gap-3"
           >
-            בואו נתחיל! 🚀
-          </button>
-        </form>
+            <span>אני ילד/ה</span>
+            <span className="text-3xl">🧒</span>
+          </Link>
+
+          <Link
+            href="/parent/register"
+            className="bg-white hover:bg-gray-50 text-gray-700 font-bold text-xl py-4 rounded-3xl shadow border-2 border-gray-200 hover:border-orange-300 transition-all duration-200 active:scale-95 flex items-center justify-center gap-3"
+          >
+            <span>אני הורה</span>
+            <span className="text-2xl">👨‍👩‍👧‍👦</span>
+          </Link>
+        </div>
       </div>
     </main>
   );
