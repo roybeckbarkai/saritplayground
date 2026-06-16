@@ -25,16 +25,14 @@ export default function SpinPage() {
   return (
     <main className="min-h-screen flex flex-col items-center bg-white">
       {/* Header */}
-      <div className="w-full border-b border-slate-100 px-5 py-4 flex items-center justify-between max-w-lg mx-auto">
+      <div className="w-full px-5 pt-12 pb-2 flex items-center justify-between max-w-lg mx-auto">
         <Link href="/child/login" className="text-slate-400 text-sm">→ חזרה</Link>
-        <div className="text-center">
-          <p className="font-semibold text-slate-900">{child.name}</p>
-          <p className="text-xs text-slate-400">{activeFoods.length} אפשרויות</p>
-        </div>
+        <p className="font-semibold text-slate-900">{child.name}</p>
         <div className="w-12" />
       </div>
 
-      <div className="w-full max-w-lg px-4 pt-6 flex flex-col items-center">
+      <div className="w-full max-w-lg px-4 pt-2 pb-8 flex flex-col items-center gap-3">
+        <p className="text-lg font-bold text-slate-700 text-center">תנו למזל לבחור מה לאכול</p>
         <SpinWheel foods={activeFoods} />
       </div>
     </main>
