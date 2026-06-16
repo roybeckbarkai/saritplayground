@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { getFamilies, getChildrenByFamily, saveChild, deleteChild, defaultFoodOptions } from '@/lib/storage';
 import { Child, FoodOption, Family } from '@/lib/types';
 import Link from 'next/link';
+import { suggestEmoji } from '@/lib/emojiSuggest';
 
 const FOOD_EMOJIS = [
   '🍳','🥚','🥪','🧀','🍕','🫓','🥗','🥫','🧈','🥣',
@@ -208,7 +209,10 @@ export default function ParentSetupPage() {
               <input
                 type="text"
                 value={customName}
-                onChange={e => setCustomName(e.target.value)}
+                onChange={e => {
+                  setCustomName(e.target.value);
+                  if (!showEmojiPicker) setCustomEmoji(suggestEmoji(e.target.value));
+                }}
                 onKeyDown={e => e.key === 'Enter' && addCustomFood()}
                 placeholder="שם המנה"
                 className="flex-1 border border-slate-200 rounded-xl px-4 h-11 focus:outline-none focus:border-sky-400 text-slate-900 text-sm bg-white min-w-0"
