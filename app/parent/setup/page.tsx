@@ -102,47 +102,56 @@ export default function ParentSetupPage() {
 
   return (
     <main className="min-h-screen bg-white pb-28">
-      {/* Header */}
-      <div className="px-5 pt-14 pb-6">
-        <div className="flex items-center justify-between mb-6">
+      {/* Header — מתכווץ אחרי בחירת ילד */}
+      <div className={`transition-all duration-300 ${editingChild ? 'px-5 pt-12 pb-3' : 'px-5 pt-14 pb-6'}`}>
+        <div className="flex items-center justify-between mb-4">
           <Link href="/" className="text-slate-400 text-sm">בית</Link>
           <span className="text-sm text-slate-400 font-medium">
             {family?.familyName ? `משפחת ${family.familyName}` : ''}
           </span>
         </div>
 
-        {/* Add child */}
-        <div className="flex gap-2 mb-2">
-          <button
-            onClick={addChild}
-            className="bg-sky-500 hover:bg-sky-600 text-white font-medium w-11 h-11 rounded-xl transition-colors text-xl flex-shrink-0 flex items-center justify-center"
-          >+</button>
-          <input
-            type="text"
-            value={newChildName}
-            onChange={e => setNewChildName(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && addChild()}
-            placeholder="הוסיפו ילד/ה"
-            className="flex-1 border border-slate-200 rounded-xl px-4 h-11 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-slate-900 bg-white text-sm"
-          />
-        </div>
+        {/* Add child — נסתר אחרי בחירת ילד */}
+        {!editingChild && (
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={addChild}
+              className="bg-sky-500 hover:bg-sky-600 text-white font-medium w-11 h-11 rounded-xl transition-colors text-xl flex-shrink-0 flex items-center justify-center"
+            >+</button>
+            <input
+              type="text"
+              value={newChildName}
+              onChange={e => setNewChildName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && addChild()}
+              placeholder="הוסיפו ילד/ה"
+              className="flex-1 border border-slate-200 rounded-xl px-4 h-11 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400 text-slate-900 bg-white text-sm"
+            />
+          </div>
+        )}
 
         {/* Children tabs */}
         {children.length > 0 && (
-          <div className="flex gap-2 mt-4 overflow-x-auto pb-1">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {children.map(child => (
               <button
                 key={child.id}
                 onClick={() => setEditingChild(editingChild?.id === child.id ? null : child)}
                 className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all border ${
                   editingChild?.id === child.id
-                    ? 'bg-slate-900 text-white border-slate-900'
+                    ? 'bg-sky-500 text-white border-sky-500'
                     : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'
                 }`}
               >
                 {child.name}
               </button>
             ))}
+            {/* כפתור הוספה קטן כשבמצב עריכה */}
+            {editingChild && (
+              <button
+                onClick={() => setEditingChild(null)}
+                className="flex-shrink-0 px-3 py-2 rounded-full text-sm text-sky-500 border border-sky-200 hover:bg-sky-50 transition-all"
+              >+ ילד/ה</button>
+            )}
           </div>
         )}
       </div>
