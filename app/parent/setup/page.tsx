@@ -168,7 +168,7 @@ export default function ParentSetupPage() {
                 {/* Left: checkbox */}
                 <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                   food.isActive
-                    ? 'bg-slate-900 border-slate-900'
+                    ? 'bg-sky-500 border-sky-500'
                     : 'border-slate-300 bg-white'
                 }`}>
                   {food.isActive && (
@@ -253,7 +253,7 @@ export default function ParentSetupPage() {
         <div className="fixed bottom-0 right-0 left-0 p-5 bg-white border-t border-slate-100">
           <Link
             href="/parent/done"
-            className="block w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold text-base py-4 rounded-2xl text-center transition-colors"
+            className="block w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold text-base py-4 rounded-2xl text-center transition-colors"
           >
             המשך
           </Link>
