@@ -200,7 +200,7 @@ export default function SpinWheel({ foods }: Props) {
         className="bg-sky-500 hover:bg-sky-600 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold text-xl px-12 py-4 rounded-full transition-all duration-200 active:scale-95 shadow-md"
         style={{ letterSpacing: '-0.01em' }}
       >
-        {spinning ? '⏳ מסתובב...' : 'יאללה לסובב! 🎲'}
+        {spinning ? '⏳ מסתובב...' : 'יאללה לסובב!'}
       </button>
 
       {/* Result */}
